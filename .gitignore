@@ -1,3 +1,4 @@
 /ppt/
 *.bak
 /*.pdf
+/dist/
