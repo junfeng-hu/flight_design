@@ -26,4 +26,4 @@ create 'flight:order',
         COMPRESSION => 'SNAPPY',
         BLOCKCACHE => 'false'}
 
-order_cf_o_cq = 'startplace:arrivalplace:starttime:arrivaltime:price'
+order_cf_o_cq = 'startplace:arrivalplace:starttime:arrivaltime:price:isfirst'
