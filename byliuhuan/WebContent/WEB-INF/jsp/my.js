@@ -1,0 +1,4 @@
+
+function my(){
+	alert('aaa')
+}
