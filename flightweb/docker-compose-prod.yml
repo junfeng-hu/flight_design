@@ -1,0 +1,10 @@
+flightadmin-postgresql:
+  container_name: flightadmin-postgresql
+  image: postgres:9.4.5
+  # volumes:
+  #   - ~/volumes/jhipster/flightadmin/postgresql/:/var/lib/postgresql/
+  environment:
+    - POSTGRES_USER=flightadmin
+    - POSTGRES_PASSWORD=
+  ports:
+    - "5432:5432"

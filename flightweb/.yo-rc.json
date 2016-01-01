@@ -1,0 +1,24 @@
+{
+  "generator-jhipster": {
+    "baseName": "flightadmin",
+    "packageName": "cn.edu.fudan.flightadmin",
+    "packageFolder": "cn/edu/fudan/flightadmin",
+    "authenticationType": "session",
+    "hibernateCache": "no",
+    "clusteredHttpSession": "no",
+    "websocket": "no",
+    "databaseType": "sql",
+    "devDatabaseType": "postgresql",
+    "prodDatabaseType": "postgresql",
+    "searchEngine": "no",
+    "useSass": true,
+    "buildTool": "maven",
+    "frontendBuilder": "grunt",
+    "enableTranslation": true,
+    "enableSocialSignIn": false,
+    "rememberMeKey": "69d333d8218119330c164561245159091c6149e1",
+    "testFrameworks": [
+      "gatling"
+    ]
+  }
+}

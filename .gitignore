@@ -126,3 +126,4 @@ dist/
 *.bak
 /*.pdf
 /dist/
+bower_components/
