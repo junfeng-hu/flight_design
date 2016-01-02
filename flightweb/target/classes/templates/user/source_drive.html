@@ -1,0 +1,258 @@
+<html>
+<head>
+    <script type="text/javascript" src="/js/vis.min.js"></script>
+    <link href="/css/vis.min.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"/>
+
+    <style type="text/css">
+        #mynetwork {
+        height: 600px;
+        border: 1px solid lightgray;
+        }
+    </style>
+</head>
+<body>
+<div id="mynetwork"></div>
+
+<script type="text/javascript">
+/*var source_list=[];
+var derive_list=[];
+var accessed_package=['hypergrad-data'];
+for (package_Id in accessed_package){
+        $.ajax({
+        type:'get',
+        url:'/track/source',
+        data:'packageId='+accessed_package[package_Id]+'',
+        dataType:'json',
+        success:function(data){
+           source_list.push(data);
+        }
+        })
+
+         $.ajax({
+        type:'get',
+        url:'/track/derive',
+        data:'packageId='+accessed_package[package_Id]+'',
+        dataType:'json',
+        success:function(data){
+           derive_list.push(data);
+        }
+        })
+
+
+}
+*/
+var source_list=[{
+  "packageId" : "hypergrad-data",
+  "packageRs" : [ {
+    "packageId" : "keytab",
+    "fields" : {
+      "admins.keytab" : null,
+      "users.keytab" : [ ]
+    }
+  }, {
+    "packageId" : "keytab2",
+    "fields" : null
+  } ],
+  "assetsRs" : {
+    "mnist_data.pkl" : {
+      "assetRs" : [ {
+        "packageId" : "hbase_package1",
+        "fields" : {
+          "tt" : null,
+          "new_tt" : [ "cf" ]
+        }
+      } ],
+      "fieldsRs" : null
+    }
+  }
+}]
+
+var derive_list=[{
+  "packageId" : "hbase_package1",
+  "packageRs" : [ ],
+  "assetsRs" : {
+    "tt" : {
+      "assetRs" : [ {
+        "packageId" : "hypergrad-data",
+        "fields" : {
+          "mnist_data.pkl" : null
+        }
+      } ],
+      "fieldsRs" : null
+    },
+    "new_tt" : {
+      "assetRs" : null,
+      "fieldsRs" : {
+        "cf" : [ {
+          "packageId" : "hypergrad-data",
+          "fields" : {
+            "mnist_data.pkl" : null
+          }
+        } ]
+      }
+    }
+  }
+}
+]
+
+  var nodeobj=[];
+  var edgeobj=[];
+  var source='to'
+  var derive='from'
+  var nodeset = {};
+  type = 'source'
+  function isInset(onenode){
+    return nodeset[JSON.stringify(onenode)]==1;
+  }
+
+  function isNull(listobj){
+    return listobj==null
+  }
+
+  //添加与target_package相关的包和资产
+  //处理packageentity list
+  function handleRs(listpackages,targetnode,type){
+    for(package_ in listpackages){
+          var onenode={id:listpackages[package_]['packageId'],label:listpackages[package_]['packageId'],group:'package'}
+          var dashedge={from:onenode['id'],to:targetnode['id'],arrows:eval(type),dashes:true}//溯源
+          if(!isInset(onenode)){
+            nodeobj.push(onenode)
+            nodeset[JSON.stringify(onenode)]=1
+          }
+          edgeobj.push(dashedge)
+          var assets_fileds=listpackages[package_]['fields'];
+          //处理assets,assets_fileds type {}
+          for (asset in assets_fileds){
+              onenode = {id:asset,label:asset,group:'asset'};
+              dashedge={from:onenode['id'],to:targetnode['id'],arrows:eval(type),dashes:true}//溯源
+              solidedge={from:listpackages[package_]['packageId'],to:onenode['id']};
+              if(!isInset(onenode)){
+               nodeobj.push(onenode)
+               nodeset[JSON.stringify(onenode)]=1
+              }
+              edgeobj.push(dashedge,solidedge)
+              //处理fields  asset_fileds[asset] type []
+              for (field in assets_fileds[asset]){
+                onenode = {id:assets_fileds[asset][field],label:assets_fileds[asset][field],group:'field'};
+                dashedge= {from:onenode['id'],to:targetnode['id'],arrows:eval(type),dashes:true}//溯源
+                solidedge={from:asset,to:onenode['id']};
+                if(!isInset(onenode)){
+                  nodeobj.push(onenode);
+                  nodeset[JSON.stringify(onenode)]=1
+                }
+                  edgeobj.push(dashedge,solidedge)
+              }
+
+          }
+  }
+  }
+
+
+
+  //绘制追踪溯源图  type source or derive
+  function draw_graph(listobj,type){
+    for(obj_index in listobj){
+      obj=listobj[obj_index];
+      var target_pnode={id:obj['packageId'],label:obj['packageId'],group:'package'};
+      if(!isInset(target_pnode)){
+                  nodeobj.push(target_pnode);
+                  nodeset[JSON.stringify(target_pnode)]=1
+      }
+
+      var listpackages = obj['packageRs'];
+      handleRs(listpackages,target_pnode,type);
+      //添加与target_asset相关的包和资产
+      var target_assets_fields = obj['assetsRs']
+      for(target_asset in target_assets_fields){
+        onenode = {id:target_asset,label:target_asset,group:'asset'};
+        solidedge = {from:target_pnode['id'],to:onenode['id']}
+        if(!isInset(onenode)){
+                  nodeobj.push(onenode);
+                  nodeset[JSON.stringify(onenode)]=1
+        }
+        edgeobj.push(solidedge)
+        var trackasset = target_assets_fields[target_asset]
+        listpackages = trackasset['assetRs'];
+        //处理与资产相关的包和资产
+        handleRs(listpackages,onenode,type);
+        for (target_field in trackasset['fieldsRs']){
+          onenode = {id:target_field,label:target_field,group:'field'};
+          solidedge = {from:target_asset['id'],to:onenode['id']};
+           if(!isInset(onenode)){
+                  nodeobj.push(onenode);
+                  nodeset[JSON.stringify(onenode)]=1
+                }
+          edgeobj.push(solidedge)
+          listpackages = trackasset['fieldsRs'][target_field]
+            //处理字段相关的包和资产
+          handleRs(listpackages,onenode,type)
+        }
+
+  }
+
+
+
+    }
+  }
+
+
+    draw_graph(source_list,'source');
+
+    draw_graph(derive_list,'derive');
+
+    //add people node
+    nodeobj.push({id:'user',label:'hdfs',icon:{
+        face:'FontAwesome',
+        code:'\uf007',
+        color:'#2B7CE9',
+        size:50
+    },level:3,shape:'icon'
+  })
+    var nodes = new vis.DataSet(nodeobj);
+
+    edgeobj.push({from:'user',to:'hypergrad-data',arrows:'to',label:'accessed'},{from:'user',to:'hbase_package1',arrows:'to',label:'accessed'})
+    // create an array with edges
+    var edges = new vis.DataSet(edgeobj);
+
+    // create a network
+    var container = document.getElementById('mynetwork');
+
+    // provide the data in the vis format
+    var data = {
+        nodes: nodes,
+        edges: edges
+    };
+    //var options = {};
+
+     var options = {
+        layout:{
+      hierarchical:{
+         enabled:true,
+         levelSeparation: 150,
+         direction: 'UD'
+      }
+
+  },
+        interaction:{
+          hover:true
+        },
+        height:'600px',
+  groups:{
+    package:{shape:'database',level:0},
+    asset:{shape:'eclipse',color:'#ffff00',level:1},
+    field:{shape:'circle',color:'#ff0000',level:2}
+  }
+}
+
+
+    // initialize your network!
+    var network = new vis.Network(container, data, options);
+     var items = nodes.get();
+        $.each(items,function(i,v){
+         nodes.update({id:v.id,label:v.label.substr(0,8),title:v.label});
+        })
+</script>
+</body>
+</html>

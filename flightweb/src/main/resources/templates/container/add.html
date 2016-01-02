@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xml:lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <title>Document</title>
+    <script src="/js/jquery.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <script src="/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/main.css"/>
+</head>
+<body>
+<div th:include="index::navi"></div>
+<div class="container">
+            <h1>添加数据容器</h1>
+            <hr/>
+    <div class="row">
+        <form id="submitForm" action="/container" method="post">
+            <div class="col-sm-6">
+                <div class="row mb10">
+                    <div class="col-sm-3">
+                        <label>容器名称</label>
+                    </div>
+                    <div class="col-sm-9">
+                        <input type="text" name="name" placeholder="容器名称" class="form-control"/>
+                    </div>
+                </div>
+
+                <div class="row mb10">
+                    <div class="col-sm-3">
+                        <label>容器类型</label>
+                    </div>
+                    <div class="col-sm-9 selection">
+                        <select id="containerType" name="type" class="form-control">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb10">
+                    <div class="col-sm-3">
+                        <label>容器说明</label>
+                    </div>
+                    <div class="col-sm-9">
+                        <input type="text" name="description" placeholder="容器说明" class="form-control"/>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="col-sm-12">
+                <table class="table table-hover table-striped" id="linkTable">
+                    <thead>
+                    <tr><th>链接信息</th>
+                        <th>数据</th>
+                        <th>说明</th>
+                    </tr></thead>
+                    <tbody id="tableContent">
+                    </tbody>
+                </table>
+                <input type="submit" id="submitBtn" value="添加"/>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+   $(".navbar-collapse>ul>li").eq(1).addClass("active");
+    $.getJSON('/model/rest',function(data){
+             $.each(data,function(i){
+             var option="<option value='+data[i]+'>"+data[i]+"</option>";
+             $("#containerType").append(option);
+             });
+    });
+    });
+    $("#containerType").change(function(){
+         if($(this).val().length==0){
+             $("#tableContent").html("");
+             return false; }
+         $.getJSON('/model/rest/'+$(this).val(),function(data){
+                   $("#tableContent").html("");
+                   var str=data.containerModel;
+                    var obj = JSON.parse(str);
+                    $.each(obj.fields,function(i,value){
+                           var html='<tr><td>'+value.name+'</td><td><textarea class="form-control" name="'+value.name+'" style="width:280px"></textarea></td></tr>';
+                           $("#tableContent").append(html);
+                        })
+         });
+    });
+
+    //ajax submit
+
+    $.fn.serializeObject = function()
+    {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function() {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                     o[this.name] = this.value || '';
+                        }
+   });
+   return o;
+   };
+
+    $("#submitBtn").click(function(){
+     var data=$('form').serializeObject();
+    console.log(data);
+     $.ajax({
+     type:'post',
+     dataType:'json',
+     url:'/container',
+     data:JSON.stringify(data),
+     contentType: 'application/json;charset=utf-8',
+     success:function(data){
+              	if(data.error!=0){
+                       swal("Error...",data.message,"error");
+		     }
+		else{
+		      swal("Success!", "添加容器成功!", "success");
+		    }
+         }
+     })
+     return false;
+	});
+</script>
+</body>
+</html>

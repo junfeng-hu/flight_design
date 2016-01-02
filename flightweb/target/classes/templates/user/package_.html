@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/bootstrap-table.css" />
+    <link rel="stylesheet" href="/css/sweet-alert.css"/>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/bootstrap-table.js"></script>
+    <script src="/js/sweet-alert.js"></script>
+</head>
+<body>
+<div th:include="index::navi"></div>
+<div class="container">
+    <header>
+        <h1>我的数据包</h1>
+        <hr />
+    </header>
+        <table id="events-table"  data-url="/package/my" data-height="500" data-search="true" data-pagination="true" data-show-columns="true">
+            <thead>
+            <tr>
+                <th data-field="name" data-sortable="true">Name</th>
+                <th data-field="type" data-sortable="true">Type</th>
+                <th data-field="ownerId" data-sortable="true">Owner</th>
+                <th data-field="state" data-align="center" data-sortable="true">State</th>
+                <th data-field="addTime" data-sortable="true">AddTime</th>
+                <th data-field="operate" data-align="center" data-formatter="operateFormatter" data-events="operateEvents">Item Operate</th>
+            </tr>
+            </thead>
+        </table>
+    <div id="info"></div>
+    </div>
+
+   <script>
+         $(".navbar-collapse>ul>li").eq(4).addClass("active");
+         //show package list  js
+        $(document).ready(function(){
+		 $('#events-table').bootstrapTable({
+		 	 });
+		 $('#events-table').bootstrapTable('hideColumn','assets');
+	});
+
+	   function operateFormatter(value, row, index) {
+        return [
+            '<a class="remove ml10" href="javascript:void(0)" title="Remove">',
+                '<i class="glyphicon glyphicon-remove"></i>',
+            '</a>',
+              '<a class="detail ml10" href="/package/'+row.type+':'+row.containerId+':'+row.name+'" title="Detail">',
+                '<i class="glyphicon glyphicon-option-horizontal"></i>',
+            '</a>'
+        ].join('');
+    }
+
+          window.operateEvents = {
+        'click .remove': function (e, value, row, index) {
+         swal({   title: "Are you sure?",   text: "You will not be able to recover this  file!",   type: "warning",   showCancelButton: true,   confirmButtonColor: "#DD6B55",   confirmButtonText: "Yes, delete it!",   closeOnConfirm: false }, function(){
+               $('#events-table').bootstrapTable('remove', {field: 'name', values:[row.name]});
+               $.ajax({
+                  url:'/upload/'+row.type+':'+row.containerId+':'+row.name,
+                  type:'DELETE'
+               });
+               swal("Deleted!", "Your file has been deleted.", "success");
+             });
+
+        },
+        'click .detail':function(e,value,row,index){
+
+        }
+    };
+   </script>
+</body>
+</html>

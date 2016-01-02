@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html xml:lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <title>Document</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/vis.min.css"/>
+    <link rel="stylesheet" href="/css/sweet-alert.css"/>
+    <link rel="stylesheet" href="/css/jquery.treeview.css"/>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.treeview.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/vis.min.js"></script>
+    <script src="/js/sweet-alert.js"></script>
+
+</head>
+<body>
+<div th:include="index::navi"></div>
+<div class="container-fluid">
+    <div class="row" >
+        <div class="col-sm-6">
+            <p class="well" style="background-color:#ccc;text-align:center">数据包信息</p>
+            <form class="form-horizontal" th:object="${packageInfo}">
+                <div class="form-group">
+                    <label  class="col-sm-2 control-label" style="text-align:right">Name:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" placeholder="Name" name="name" th:value="*{name}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" style="text-align:right">KeyWords:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" placeholder="Password" name="keywords" th:value="*{keywords}"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" style="text-align:right">Description:</label>
+                    <div class="col-sm-10">
+                        <textarea class="form-control" rows="3" name="description" th:text="*{description}"></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" style="text-align:right">一级:</label>
+                    <div class="col-sm-4">
+                        <select class="form-control" name="subject1">
+                            <option value="math" th:selected="*{subject1}==math">数学</option>
+                            <option value="chinese" th:selected="*{subject1}==chinese">计算机科学技术</option>
+                            <option value="test" th:selected="*{subject1}==test">生物学</option>
+                        </select>
+                    </div>
+                    <label class="col-sm-2 control-label" style="text-align:right">二级:</label>
+                    <div class="col-sm-4">
+                        <select class="form-control" name="subject2" >
+                            <option value="math" th:selected="*{subject2}==math">植物学</option>
+                            <option value="chinese" th:selected="*{subject2}==chinese">计算机应用技术</option>
+                            <option value="test" th:selected="*{subject2}==test">基础数学</option>
+                        </select>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" style="text-align:right">Type:</label>
+                    <div class="col-sm-4">
+                        <select id="containerType" name="type" class="form-control">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                    <label class="col-sm-2 control-label" style="text-align:right">File_Id:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" name="file" th:value="*{file}"/>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-sm-offset-3">
+                    <input type="reset" class="btn btn-primary" value="reset" />
+                </div>
+                <div class="col-sm-3 col-sm-offset-3">
+                    <a href="" class="btn btn-primary" id="submit">save</a>
+                </div>
+            </form>
+
+        </div>
+        <div class="col-sm-6">
+            <div id="network" style="border:5px solid green;height:500px">
+
+            </div>
+
+            <div id="tree" style="border:5px solid green;height:500px;display:none">
+
+            </div>
+        </div>
+
+        <button class="btn btn-primary pull-right" style="margin-top:10px;margin-right:10px" id="changeView">ChangeView</button>
+
+
+    </div>
+</div>
+</body>
+<script th:inline="javascript">
+
+  var info=[[${packageInfo}]];
+  var nodestr=[[${nodes}]];
+  var edgestr=[[${edges}]];
+  var strdata=[[${apply}]];
+  var testdata=JSON.parse(strdata);
+  console.log(testdata);
+  //var cur_user=[[${session.META_USER['username']}]];
+      $("#info").addClass("hide");
+
+
+  //填充type
+  $(document).ready(function(){
+    $.getJSON('/model/rest',function(data){
+             $.each(data,function(i){
+             if(data[i]==info.type){
+               var option='<option value="'+data[i]+'" selected="true">'+data[i]+'</option>';
+             }else{
+                var option='<option value="'+data[i]+'">'+data[i]+'</option>';
+             }
+             $("#containerType").append(option);
+             });
+       });
+    });
+
+
+       //draw network picture
+       var nodes=new vis.DataSet(JSON.parse(nodestr));
+       var edges=new vis.DataSet(JSON.parse(edgestr));
+       var content=document.getElementById("network");
+        var data = {
+        nodes: nodes,
+        edges: edges
+    };
+      var options = {
+       	layout:{
+    hierarchical: false
+  },
+       	interaction:{
+       		hover:true
+       	},
+       	height:'500px',
+  groups:{
+  	package:{shape:'database'},
+  	asset:{color:'#ffff00',shape:'eclipse'},
+  	field:{color:'#ff0000',shape:'circle'}
+  }
+}
+    var network=new vis.Network(content,data,options);
+    var items = nodes.get();
+        console.log(items);
+        $.each(items,function(i,v){
+         nodes.update({id:v.id,label:v.label.substr(0,8),title:v.label});
+        })
+
+    //add button function hover
+   /* network.on("hoverNode",function(obj){
+       	var nodeid=obj.node;
+       	console.log(nodeid);
+       	var canobj=network.getPositions([nodeid]);
+       	var dompos=network.canvasToDOM(canobj[nodeid]);
+       	console.log(dompos);
+       	$("#info").css({left:dompos.x+20,top:dompos.y+20, position:'absolute'});
+       	$("#info").html("");
+       	$("#info").append('<button class="btn btn-primary btn-xs ask" id="'+nodeid+'">申请访问</button>');
+       })*/
+    //add button click function
+
+
+
+
+   /*     $(document).on("click",'.ask',function(){
+     // apply_info to submit
+     var apply_data={};
+     apply_data.type=info.type;
+     apply_data.packageId=info.name;
+     apply_data.ownerId=info.ownerId;
+       	var id=$(this).attr("id");
+        var item=nodes.get(id);
+        apply_data.level=item.group;
+        if(apply_data.level=="asset")
+        {
+              apply_data.assetId=item.id;
+        }
+        if(apply_data.level=="field")
+        {
+              apply_data.fieldId=item.id;
+              apply_data.assetId=network.getConnectedNodes(item.id)[0];
+
+        }
+        console.log(apply_data);
+
+ $.ajax({
+     type:'post',
+     dataType:'json',
+     url:'/authorize/apply',
+     data:JSON.stringify(apply_data),
+     contentType: 'application/json;charset=utf-8',
+     success:function(data){
+              	if(data.error!=0){
+                       swal("Error...",data.message,"error");
+		     }
+		else{
+		      swal("Success!", "申请授权成功!", "success");
+		    }
+         }
+     })
+
+
+       });*/
+
+
+          var apphtml='<li class="package">'+'<span>'+testdata.packageId+'</span>'+'<input type="checkbox" value="4" name="checkbox" style="margin-left:70px"/>申请读'+'<input type="checkbox" value="2" name="checkbox" style="margin-left:10px"/>申请写';
+          apphtml+='<ul>';
+          $.each(testdata.assets,function(index,value){
+          	apphtml+='<li class="asset">'+'<span>'+value.assetName+'</span>'+'<input type="checkbox" value="4" name="checkbox" style="margin-left:50px"/>申请读'+'<input type="checkbox" value="2" name="checkbox" style="margin-left:10px"/>申请写'+'<ul>';
+          	$.each(value.fields,function(i,v){
+          		apphtml+='<li class="field">'+'<span>'+v.fieldName+'</span>'+'<input type="checkbox" value="4" name="checkbox" style="margin-left:50px"/>申请读'+'<input type="checkbox" value="2" name="checkbox" style="margin-left:10px"/>申请写'+'</li>';
+          	})
+          	apphtml+='</ul></li>';
+          })
+          apphtml+='</ul></li>';
+          $("#tree").append(apphtml);
+          $("#tree").treeview();
+          $("#tree").append('<button id="submittree">申请授权</button>');
+
+            $("input[type=checkbox]").click(function(){
+          	var value=$(this).val();
+          	if(this.checked){
+          		$(this).parent().find("ul input[value="+value+"]").each(function() {
+          			this.checked=true;
+          			this.disabled=true;
+          		})
+          		//isChecked=true;
+          	}
+          	else{
+          		  $(this).parent().find("ul input[value="+value+"]").each(function(){
+          		  	this.checked=false;
+          		  	this.disabled=false;
+          		  })
+          		  //isChecked=false;
+          	}
+          })
+
+       //申请授权
+         $("#submittree").click(function(){
+            //主要是level和读写怎么表示的问题
+         	var apply={};
+         	var pac=testdata.packageId;
+         	var checkboxes = document.getElementsByName("checkbox");
+         	var checked=[];//得到所有选中的checkbox
+         	var haschecked=false;
+         	$.each(checkboxes,function(index,value){
+         		if(value.checked==true){
+         			checked.push(value)
+         			haschecked=true;
+         		}
+         	})
+         	if(haschecked){
+         	   apply.packageId=pac;
+         	}
+
+         	var checkedpac=[];
+         	var checkedass=[];
+         	var checkedfie=[];
+         	$.each(checked,function(i,v){
+         	     var classname=$(v).parent().attr("class");
+         	     if(classname.indexOf("package")!=-1){
+         	     	checkedpac.push(v);
+         	     }else if(classname.indexOf("asset")!=-1){
+         	     	checkedass.push(v);
+         	     }else{
+         	     	checkedfie.push(v);
+         	     }
+         	})
+         	var sumpac=0;
+         	//遍历选中的packagecheckbox
+         	$.each(checkedpac,function(i,v){
+         		sumpac+=Number(v.value);
+         		apply.access=sumpac;
+         	})
+         	//console.log(apply);
+         	var sumass=0;var tempobj={};var assets=[];
+            //遍历选中的assetcheckbox
+         	$.each(checkedass,function(i,v){
+         		var assname=$(v).siblings("span").text();
+         		if(typeof(tempobj[assname])=="undefined"){
+         			tempobj[assname]=Number(v.value);
+         		}else{
+                    tempobj[assname]+=Number(v.value);
+         		}
+         	})
+         	//遍历选中的fieldcheckbox
+         	var tempobj2={};var parentobj={};
+         	$.each(checkedfie,function(i,v){
+         		var fiename=$(v).siblings("span").text();
+         		var pa=$(v).parents(".asset").children("span").text();
+         		if(typeof(parentobj[pa])=="undefined"){
+         			parentobj[pa]=[];
+         			parentobj[pa].push(fiename);
+         		}else{
+         			parentobj[pa].push(fiename);
+         		}
+         		if(typeof(tempobj2[fiename])=="undefined"){
+         			tempobj2[fiename]=Number(v.value);
+         		}else{
+                    tempobj2[fiename]+=Number(v.value);
+         		}
+         	})
+
+         	//处理只选择field未选择asset的情况
+
+            //拼接到assets数组中
+
+            if(jQuery.isEmptyObject(parentobj)){
+            	$.each(tempobj,function(i1,v1){
+            		assets.push({assetName:i1,access:tempobj[i1]})
+            	})
+            }else{
+            	 $.each(parentobj,function(i,v){
+            	if(typeof(tempobj[i])=="undefined"){
+            		assets.push({assetName:i});
+            	}else{
+            		assets.push({assetName:i,access:tempobj[i]});
+            	}
+            })
+            }
+
+
+         	//console.log(parentobj);
+         	//console.log(tempobj2);
+         	//console.log(assets);
+         	//将field信息填充到assets中
+         	$.each(assets,function(i,assv){
+         		var tassname=assv.assetName;
+         		assets[i].fields=[];
+         		$.each(parentobj,function(j,arr){
+         			if(tassname==j){
+         				for(index in arr)
+         				assets[i].fields.push({fieldName:arr[index],access:tempobj2[arr[index]]});
+         			}
+         		})
+         	})
+         	apply.assets=assets;
+         	console.log(apply);
+
+         	$.ajax({
+     type:'post',
+     dataType:'json',
+     url:'/authorize/apply',
+     data:JSON.stringify(apply),
+     contentType: 'application/json;charset=utf-8',
+     success:function(data){
+              	if(data.error!=0){
+                       swal("Error...",data.message,"error");
+		     }
+		else{
+		      swal("Success!", "申请授权成功!", "success");
+		    }
+         }
+     })
+
+         })
+
+
+      $("#changeView").click(function(){
+      $("#network").toggle();
+      $("#tree").toggle();
+      })
+
+
+</script>
+</html>

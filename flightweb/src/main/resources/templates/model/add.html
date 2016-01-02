@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+		<meta name="viewporrt" content ="width=device-width, initial-scale=1"/>
+
+
+		<title>大数据平台的元数据管理系统</title>
+		<meta name="description" content=" "/>
+		<meta name="keywords" content="metadata"/>
+		<meta name="author" content=" "/>
+
+		
+		<link rel="stylesheet" href="/css/bootstrap.min.css" media="screen"/>
+    <link rel="stylesheet" href="/css/login.css" media="screen"/>
+    <link rel="stylesheet" href="/css/page.css" media="screen"/>
+    <link rel="stylesheet" href="/css/detail.css" media="screen"/>
+
+		<script src="/js/jquery.min.js"></script>
+		<script src="/js/bootstrap.min.js"></script>
+	</head>
+	<body>
+    <div th:include="index::navi"></div>
+    <div class="container-fluid my-container">
+      <header>
+        <h1>添加元模型</h1>
+        <hr class="col-sm-6 col-sm-offset-3"/>
+      </header>
+      <section class="container">
+        <form class="form-horizontal col-sm-offset-2 vertical" style="text-align:center"
+              action="/model" method="post" enctype="multipart/form-data">
+          <div class="form-group form-group-lg">
+            <label for="inputUsername" class="col-sm-3 control-label" style="text-align:center">模型名称</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" name="type"/>
+            </div>
+          </div>
+          <div class="form-group form-group-lg">
+            	<span class="btn btn-success col-sm-3">
+            		<span class="fileupload">
+            		容器模型文件
+            		</span>
+            		<input type="file" name="containerModel" style="display:none" />
+            	</span>
+            	<span class="col-sm-4 well" style="height:35px;margin-left:16px"></span>
+          </div>
+          <div class="form-group form-group-lg">
+          	<span class="btn btn-success col-sm-3">
+          	<span class="fileupload">数据包模型文件</span>
+          	<input type="file" name="packageModel" style="display:none" />
+          	</span>
+             <span class="col-sm-4 well" style="height:35px;margin-left:16px"></span>
+          </div>
+          <div class="form-group form-group-lg">
+           	<span class="btn btn-success col-sm-3">
+           	<span class="fileupload">资产模型文件</span>
+           	<input type="file" name="assetModel" style="display:none" />
+           	</span>
+            <span class="col-sm-4 well" style="height:35px;margin-left:16px"></span>
+          </div>
+          <div class="form-group form-group-lg">
+            	<span class="btn btn-success col-sm-3">
+            	<span class="fileupload">字段模型文件</span>
+            	<input type="file" name="fieldModel" style="display:none" />
+            	</span>
+             <span class="col-sm-4 well" style="height:35px;margin-left:16px"></span>
+          </div>
+          <div class="form-group form-group-lg">
+           	<span class="btn btn-success col-sm-3">
+           	<span class="fileupload">Adapter Jar包</span>
+           	<input type="file" name="adapterJar" style="display:none" />
+           	</span>
+             <span class="col-sm-4 well" style="height:35px;margin-left:16px"></span>
+          </div>
+          <div class="form-group form-group-lg">
+            	<span class="btn btn-success col-sm-3">
+            	<span class="fileupload">Adapter JS</span>
+            	<input type="file" name="adapterJs" style="display:none" />
+            	</span>
+             <span class="col-sm-4 well" style="height:35px;margin-left:16px"></span>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-offset-3 col-sm-4">
+                <button type="submit" class="btn btn-default btn-lg" id="submitBtn">添加</button>
+            </div>              
+          </div>          
+          </form>
+          </section>
+        <footer>
+          <p>Copyright © Fudan University 2015</p> 
+          <p>All Rights Reserved</p>
+        </footer>
+    </div>
+    <script type="text/javascript">
+    $(".navbar-collapse>ul>li").eq(2).addClass("active");
+    $(".fileupload").click(function(){
+    	$(this).siblings(":input").click();
+    })
+    $(":file").change(function(){
+    	$(this).parent().siblings("span").text($(this).val());
+    })
+    $("#submitBtn").click(function(){
+   $("form").ajaxSubmit(function(data){
+		if(data.error!=0){
+		            swal("Error...",data.message,"error");
+		     }
+		else{
+		            swal("Success!", "添加容器成功!", "success");
+		    }
+   })
+   return false;
+   })
+    </script>
+         
+	</body>
+</html>

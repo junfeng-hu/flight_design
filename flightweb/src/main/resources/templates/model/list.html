@@ -1,0 +1,64 @@
+<!DOCtype html>
+<html lang="zh-cmn-Hans" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+		<meta name="viewporrt" content ="width=device-width, initial-scale=1"/>
+
+
+		<title>大数据平台的元数据管理系统</title>
+		<meta name="description" content=" "/>
+		<meta name="keywords" content="metadata"/>
+		<meta name="author" content=" "/>
+
+		
+		<link rel="stylesheet" href="css/bootstrap.min.css" media="screen"/>
+    <link rel="stylesheet" href="css/login.css" media="screen"/>
+    <link rel="stylesheet" href="css/page.css" media="screen"/>
+		<script src="js/jquery.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+	</head>
+	<body>
+    <div th:include="index::navi"></div>
+
+		<div class="container">
+            <h1>元模型</h1>
+            <hr/>
+      <div class="row">
+        <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>元模型</th>
+                  <th>添加人</th>
+                  <th>详情</th>
+                  <th>删除</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="model:${metaModels}">
+                  <td th:text="${model}">1,001</td>
+                  <td>admin</td>
+                  <td><a class="btn btn-primary" th:href="@{'/model/'+${model}}">详情</a></td>
+                  <td><a class="btn btn-danger">删除</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+    </div>
+  </div>
+         
+
+    <footer>
+      <p>Copyright © Fudan University 2015</p> 
+      <p>All Rights Reserved</p>
+    </footer>
+
+		
+		
+         
+	</body>
+    <script>
+        $(".navbar-collapse>ul>li").eq(2).addClass("active");
+    </script>
+</html>

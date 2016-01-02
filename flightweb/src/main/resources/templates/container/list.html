@@ -1,0 +1,66 @@
+<!DOCtype html>
+<html lang="zh-cmn-Hans" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+		<meta name="viewporrt" content ="width=device-width, initial-scale=1"/>
+
+
+		<title>大数据平台的元数据管理系统</title>
+		<meta name="description" content=" "/>
+		<meta name="keywords" content="metadata"/>
+		<meta name="author" content=" "/>
+
+		
+		<link rel="stylesheet" href="css/bootstrap.min.css" media="screen"/>
+    <link rel="stylesheet" href="css/login.css" media="screen"/>
+    <link rel="stylesheet" href="css/page.css" media="screen"/>
+		<script src="js/jquery.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+	</head>
+	<body>
+    <div th:include="index::navi"></div>
+		<div class="container">
+          <h1>数据容器管理</h1>
+          <hr/>
+      <div class="row">
+        <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>容器名称</th>
+                  <th>类型</th>
+                  <th>添加时间</th>
+                    <th>详情</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="container:${containers}">
+                  <td th:text="${container.name}">1,001</td>
+                  <td th:text="${container.type}">Lorem</td>
+                  <td th:text="${container.addTime}" style="width:300px">ipsum</td>
+                    <td><a th:href="@{'/container/'+${container.type}+':'+${container.name}}" class="btn btn-primary btn-sm">详情</a></td>
+                </tr>
+              </tbody>
+            </table>
+
+          </div>
+    </div>
+  </div>
+         
+
+    <footer>
+      <p>Copyright © Fudan University 2015</p> 
+      <p>All Rights Reserved</p>
+    </footer>
+
+		
+		
+         
+	</body>
+    <script th:inline="javascript">
+       $(".navbar-collapse>ul>li").eq(1).addClass("active");
+       var contain=[[${containers}]];
+       console.log(contain);
+    </script>
+</html>
