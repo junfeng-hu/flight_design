@@ -1,7 +1,0 @@
-.table>tbody>tr>td{
-	vertical-align: inherit;
-}
-.table>tbody>tr>td:first-child{
-	padding-left: 40px;
-	font-size: 28px;
-}
