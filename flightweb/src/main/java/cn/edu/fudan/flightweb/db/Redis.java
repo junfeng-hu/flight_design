@@ -1,10 +1,12 @@
 package cn.edu.fudan.flightweb.db;
 
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPubSub;
+import redis.clients.jedis.Protocol;
 
 import java.util.*;
 
@@ -27,13 +29,16 @@ public class Redis {
     private static final String userKeyPrefix = userSetKey + ":";
     private static final String sessionKeyPrefix = "session:";
     private static final String HOST = "10.131.244.41";
+    private static final int DB = 1;
 
     private static final Redis ourInstance = new Redis();
     public static Redis getInstance() {
         return ourInstance;
     }
 
-    private JedisPool pool = new JedisPool(HOST);
+    private JedisPool pool = new JedisPool(
+            new GenericObjectPoolConfig(), HOST, Protocol.DEFAULT_PORT,
+            Protocol.DEFAULT_TIMEOUT, null, DB);
     private Redis() {
     }
 

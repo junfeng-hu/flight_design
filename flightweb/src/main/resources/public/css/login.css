@@ -1,16 +1,10 @@
-html,body{
-	height: 100%;
-	margin: 0;
-	padding: 0;
-}
-
 header{
 	text-align: center;
 	margin-top: 5%;
 }
 
 .vertical {
-	margin-top: 10%;				
+	margin-top: 10%;
 }
 
 .container-fluid.my-container{
@@ -24,14 +18,5 @@ header{
 section{
 	margin: 0 auto;
 	padding-bottom: 60px;
-}
-
-footer{
-	position: absolute;
-	bottom: 0;
-	height: 60px;
-	width: 100%;
-	clear: both;
-	text-align: center;
 }
 

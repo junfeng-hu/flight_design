@@ -12,10 +12,10 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.security.GeneralSecurityException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 /**
@@ -106,6 +106,7 @@ public class UserController {
         user.put("username", username);
         user.put("password", Password.getSaltedHash(password));
         user.put("role", "user");
+        user.put("point", String.valueOf(0));
         redis.saveUser(username, user);
         result.setStatus(MetaResult.Status.SUCCESS);
         result.setMessage("successfully register user " + username);
@@ -197,5 +198,56 @@ public class UserController {
         session.removeAttribute(SESSION_USER);
         // session.invalidate();
         return "redirect:/user/login";
+    }
+
+    @Authenticated(Authenticated.AuthType.PAGE)
+    @RequestMapping(value = "/info", method = RequestMethod.GET)
+    public String showInfoPage(HttpSession session) {
+
+        // Map<String, String> user = (Map<String, String>) session.getAttribute(SESSION_USER);
+        return "user/info";
+    }
+
+    @Authenticated(Authenticated.AuthType.PAGE)
+    @RequestMapping(value = "/change", method = RequestMethod.GET)
+    public String showChangePage(HttpSession session) {
+        // Map<String, String> user = (Map<String, String>) session.getAttribute(SESSION_USER);
+        return "user/change";
+    }
+
+    @Authenticated(Authenticated.AuthType.JSON)
+    @ResponseBody
+    @RequestMapping(value = "/change", method = RequestMethod.POST)
+    public MetaResult handleChangePassword(@RequestParam("cur") String curPassword,
+                                           @RequestParam("new") String newPassword,
+                                           @CookieValue(COOKIE_KEY) Cookie cookie,
+                                           HttpServletResponse response,
+                                           HttpSession session) throws GeneralSecurityException {
+
+        Map<String, String> user = (Map<String, String>) session.getAttribute(SESSION_USER);
+        MetaResult result = new MetaResult();
+        // check username and password
+        if (curPassword.isEmpty() || newPassword.isEmpty()) {
+            result.setStatus(MetaResult.Status.ERROR);
+            result.setMessage("current and new password can't empty");
+            return result;
+        }
+        String username = user.get("username");
+        Redis redis = Redis.getInstance();
+        if (Password.check(curPassword, user.get("password"))) {
+            // password match
+            // change password
+            user.put("password", Password.getSaltedHash(newPassword));
+            redis.saveUser(username, user);
+            // handleLogout(cookie, response, session);
+            logger.info("user {} successfully changed password", username);
+            result.setStatus(MetaResult.Status.SUCCESS);
+            result.setMessage("successfully changed password");
+        }
+        else {
+            result.setStatus(MetaResult.Status.ERROR);
+            result.setMessage("current password is not correct");
+        }
+        return result;
     }
 }
