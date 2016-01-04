@@ -16,8 +16,11 @@
             <p class="lead">
                 当前用户名: <span th:text="${session.META_USER.username}"></span>
             </p>
-            <p class="lead">
+            <p class="lead" th:if="${session.META_USER.role}=='user'">
                 当前积分: <span th:text="${session.META_USER.point}"></span>
+            </p>
+            <p class="lead" th:if="${session.META_USER.role}=='admin'">
+                用户组: <span th:text="${session.META_USER.role}"></span>
             </p>
             <p class="lead"><a href="/user/change">修改密码</a>。</p>
         </div>

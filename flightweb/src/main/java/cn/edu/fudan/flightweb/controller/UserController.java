@@ -1,6 +1,8 @@
 package cn.edu.fudan.flightweb.controller;
 
 import cn.edu.fudan.flightweb.db.Redis;
+import cn.edu.fudan.flightweb.domain.Flight;
+import cn.edu.fudan.flightweb.domain.OrderFlight;
 import cn.edu.fudan.flightweb.interceptor.Authenticated;
 import cn.edu.fudan.flightweb.util.Password;
 import org.slf4j.Logger;
@@ -13,9 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.security.GeneralSecurityException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.sql.Date;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -249,5 +250,24 @@ public class UserController {
             result.setMessage("current password is not correct");
         }
         return result;
+    }
+
+    @Authenticated(Authenticated.AuthType.PAGE)
+    @RequestMapping(value = "/order", method = RequestMethod.GET)
+    public String showHistoryPage(HttpSession session) {
+        // Map<String, String> user = (Map<String, String>) session.getAttribute(SESSION_USER);
+        return "user/order";
+    }
+
+    @RequestMapping(value = "/search", method = RequestMethod.GET)
+    @Authenticated(Authenticated.AuthType.JSON)
+    @ResponseBody
+    List<OrderFlight> handleFindOrder(@RequestParam Date startDate,
+                                      @RequestParam Date endDate,
+                                      HttpSession session) {
+        Map<String, String> user = (Map<String, String>) session.getAttribute(SESSION_USER);
+        List<OrderFlight> orders = new ArrayList<>();
+        // TODO handle history orders search
+        return orders;
     }
 }

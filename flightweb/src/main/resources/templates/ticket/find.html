@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="index::head ('个人信息')">
+</head>
+<body>
+<nav th:replace="index::navi"></nav>
+
+<!-- Begin page content -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <div class="page-header">
+                <h1>查找航班</h1>
+            </div>
+
+            <form class="form-inline" method="get" action="/ticket/search">
+                <div class="form-group">
+                    <label for="startPlace">起飞城市</label>
+                    <input type="text" name="startPlace" value="上海" class="form-control" id="startPlace" placeholder="startPlace"/>
+                </div>
+                <div class="form-group">
+                    <label for="arrivalPlace">到达城市</label>
+                    <input type="text" name="arrivalPlace" value="周口" class="form-control" id="arrivalPlace" placeholder="arrivalPlace"/>
+                </div>
+                <div class="form-group">
+                    <label for="flightDate">出发日期</label>
+                    <input type="date" name="flightDate" value="2016-01-31" class="form-control" id="flightDate" placeholder="flightDate"/>
+                </div>
+                <button type="submit" id="search" class="btn btn-info">查找</button>
+            </form>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <div class="page-header">
+                <h1>查找结果</h1>
+            </div>
+            <table class="table table-hover" id="searchRet">
+                <thead>
+                    <tr>
+                        <th>航班编号</th>
+                        <th>起飞时间</th>
+                        <th>到达时间</th>
+                        <th>头等舱数量</th>
+                        <th>头等舱价格</th>
+                        <th>经济舱数量</th>
+                        <th>经济舱价格</th>
+                        <th>选择头等舱</th>
+                        <th>备注</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="col-md-1"></div>
+        </div>
+    </div>
+
+</div>
+
+<footer th:replace="index::footer"></footer>
+<script src="/js/findTicket.js"></script>
+</body>
+</html>

@@ -15,9 +15,9 @@
     <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen"/>
     <link rel="stylesheet" href="/css/login.css" media="screen"/>
     <link rel="stylesheet" href="/css/sticky-footer-navbar.css"/>
-    <link rel="stylesheet" href="/css/sweet-alert.css"/>
+    <link rel="stylesheet" href="/css/sweetalert.css"/>
 
-    <script src="/js/sweet-alert.js"></script>
+    <script src="/js/sweetalert-dev.js"></script>
     <script src="/js/jquery.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
     <script src="/js/jquery.form.js"></script>
@@ -60,12 +60,12 @@
     $("#submit").click(function(){
     $("form").ajaxSubmit(function(data){
     if(data.error!=0){
-            swal("Error...",data.message,"error");
-            setTimeout(failjump,1000);
-            function failjump(){
-                if(data.error==2){window.location.href="/user/login"}
-            }
-         }
+            swal({
+                title: "Error...",
+                text: data.message,
+                type: "error",
+                timer: 2000});
+    }
     else{
          swal({
          title:"Success!",
