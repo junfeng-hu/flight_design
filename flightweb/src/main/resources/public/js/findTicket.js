@@ -26,7 +26,7 @@ function handleSearchTicket(data){
 
         }
         else {
-            $tr += '<td><input type="checkbox" id="isFirst-' + flight.id + '"></td>';
+            $tr += '<td><input type="checkbox" id="isFirst-' + flight.id + '" disabled="disabled"></td>';
         }
         if (flight.firstCount > 0 || flight.economyCount > 0) {
             $tr += '<td><button type="button" class="btn btn-primary" data-id="' + flight.id + '">预订</button></td></tr>';
@@ -63,9 +63,11 @@ function doOrderTicket(e) {
     	text: "'&'分隔多位乘客",
     	type: "input",
     	showCancelButton: true,
+    	showLoaderOnConfirm: true,
     	closeOnConfirm: false
     }, function(passengers) {
         console.log(passengers);
+        if (passengers === false) return false;
     	if (passengers === "") {
     		swal.showInputError("至少输入一名乘客!");
             return false;
@@ -107,28 +109,26 @@ function handleSearchOrder(data){
     // console.log(data);
     var $tHTML = "";
     $.each(data, function(i, order) {
-        // TODO build table
+        // done build table
+
+        var names = [];
+        $.each(order.passengers, function(i, passenger) {
+                    names.push(passenger.name);
+                }
+            )
+        names = names.join("，");
         var $tr = "<tr>" +
                 "<td>" + order.flightNumber + "</td>" +
+                "<td>" + order.flightDate + "</td>" +
+                "<td>" + order.startPlace + "</td>" +
+                "<td>" + order.arrivalPlace + "</td>" +
                 "<td>" + order.startTime + "</td>" +
                 "<td>" + order.arrivalTime + "</td>" +
-                "<td>" + order.firstCount + "</td>" +
-                "<td>" + order.firstPrice + "</td>" +
-                "<td>" + order.economyCount + "</td>" +
-                "<td>" + order.economyPrice + "</td>";
-        if (order.firstCount > 0) {
-            $tr += '<td><input type="checkbox" id="isFirst-' + flight.id + '"></td>';
+                "<td>" + order.price + "</td>" +
+                "<td>" + order.first + "</td>" +
+                "<td>" + order.paid + "</td>" +
+                "<td>" + names + "</td></tr>";
 
-        }
-        else {
-            $tr += '<td><input type="checkbox" id="isFirst-' + flight.id + '"></td>';
-        }
-        if (order.firstCount > 0 || order.economyCount > 0) {
-            $tr += '<td><button type="button" class="btn btn-primary" data-id="' + flight.id + '">预订</button></td></tr>';
-        }
-        else {
-            $tr += '<td><button type="button" class="btn btn-primary" disabled="disabled">预订</button></td></tr>';
-        }
         console.log($tr);
         $tHTML += $tr;
     });

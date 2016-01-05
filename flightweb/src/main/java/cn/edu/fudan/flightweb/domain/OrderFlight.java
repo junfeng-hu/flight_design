@@ -20,6 +20,8 @@ public class OrderFlight {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+
+
     private String orderUser;
 
     @NotNull
@@ -43,7 +45,22 @@ public class OrderFlight {
     private Boolean paid;
 
     @ElementCollection
-    List<String> passengers = new ArrayList<>();
+    @CollectionTable(
+            name = "passenger",
+            joinColumns = @JoinColumn(name = "order_id")
+    )
+    List<Passenger> passengers = new ArrayList<>();
+
+    protected OrderFlight() {}
+
+    public OrderFlight(Flight flight) {
+        flightNumber = flight.getFlightNumber();
+        flightDate = flight.getFlightDate();
+        startPlace = flight.getStartPlace();
+        arrivalPlace = flight.getArrivalPlace();
+        startTime = flight.getStartTime();
+        arrivalTime = flight.getArrivalTime();
+    }
 
     public Long getId() {
         return id;
@@ -133,11 +150,11 @@ public class OrderFlight {
         this.paid = paid;
     }
 
-    public List<String> getPassengers() {
+    public List<Passenger> getPassengers() {
         return passengers;
     }
 
-    public void setPassengers(List<String> passengers) {
+    public void setPassengers(List<Passenger> passengers) {
         this.passengers = passengers;
     }
 

@@ -4,9 +4,11 @@ import cn.edu.fudan.flightweb.db.Redis;
 import cn.edu.fudan.flightweb.domain.Flight;
 import cn.edu.fudan.flightweb.domain.OrderFlight;
 import cn.edu.fudan.flightweb.interceptor.Authenticated;
+import cn.edu.fudan.flightweb.repository.OrderFlightRepository;
 import cn.edu.fudan.flightweb.util.Password;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -266,8 +268,13 @@ public class UserController {
                                       @RequestParam Date endDate,
                                       HttpSession session) {
         Map<String, String> user = (Map<String, String>) session.getAttribute(SESSION_USER);
-        List<OrderFlight> orders = new ArrayList<>();
-        // TODO handle history orders search
+        // done handle history orders search
+        List<OrderFlight> orders = orderFlightRepository.findByOrderUserAndFlightDateBetween(
+                user.get("username"), startDate, endDate
+        );
         return orders;
     }
+
+    @Autowired
+    private OrderFlightRepository orderFlightRepository;
 }

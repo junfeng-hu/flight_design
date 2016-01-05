@@ -1,8 +1,11 @@
 package cn.edu.fudan.flightweb.controller;
 
 import cn.edu.fudan.flightweb.domain.Flight;
+import cn.edu.fudan.flightweb.domain.Passenger;
 import cn.edu.fudan.flightweb.interceptor.Authenticated;
 import cn.edu.fudan.flightweb.repository.FlightRepository;
+import cn.edu.fudan.flightweb.repository.OrderFlightRepository;
+import cn.edu.fudan.flightweb.service.OrderFlightService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +15,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpSession;
 import java.sql.Date;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by junfeng on 9/12/15.
@@ -49,14 +54,32 @@ public class TicketController {
     @RequestMapping(value = "/order", method = RequestMethod.POST)
     @Authenticated
     @ResponseBody
-    MetaResult handleOrderTicket(@RequestParam int flightId,
-                                  @RequestParam String passengers,
-                                  @RequestParam Boolean isFirst) {
+    MetaResult handleOrderTicket(@RequestParam long flightId,
+                                 @RequestParam String passengers,
+                                 @RequestParam boolean isFirst,
+                                 HttpSession session) {
         MetaResult result = new MetaResult();
-        // TODO handle order logical
+        // done handle order logical
+        Map<String, String> user = (Map<String, String>) session.getAttribute(UserController.SESSION_USER);
+        List<String> passengerL = Arrays.asList(passengers.split("&"));
+        boolean ret = orderFlightService.doOrderFlight(flightId, isFirst,
+                user.get("username"), passengerL);
+        if (!ret) {
+            // order fail
+            result.setStatus(MetaResult.Status.ERROR);
+            result.setMessage("预订失败，请刷新页面");
+        }
+        else {
+            // success
+            result.setStatus(MetaResult.Status.SUCCESS);
+            result.setMessage("预订成功，请查看历史订单");
+        }
         return result;
     }
 
     @Autowired
     private FlightRepository flightRepository;
+
+    @Autowired
+    private OrderFlightService orderFlightService;
 }
