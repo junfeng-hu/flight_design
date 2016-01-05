@@ -29,16 +29,16 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li class="active"><a href="/">首页</a></li>
-                <li><a href="/ticket/find">机票查询</a></li>
+                <li class="active" id="nav-home"><a href="/">首页</a></li>
+                <li id="nav-find"><a href="/ticket/find">机票查询</a></li>
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                <li th:if="${session.META_USER}==null"><a href="/user/login">登录</a></li>
-                <li th:if="${session.META_USER}==null"><a href="/user/register">注册</a></li>
-                <li th:if="${session.META_USER}!=null and ${session.META_USER.role}=='admin'"><a href="/admin/flight">添加航班</a></li>
+                <li th:if="${session.META_USER}==null" id="nav-login"><a href="/user/login">登录</a></li>
+                <li th:if="${session.META_USER}==null" id="nav-register"><a href="/user/register">注册</a></li>
+                <li th:if="${session.META_USER}!=null and ${session.META_USER.role}=='admin'" id="nav-flight"><a href="/admin/flight">添加航班</a></li>
                 <!--li th:if="${session.META_USER}!=null and ${session.META_USER.role}=='admin'"><a href="/admin/user">管理用户</a></li-->
-                <li th:if="${session.META_USER}!=null and ${session.META_USER.role}=='user'"><a href="/user/order">历史订单</a></li>
+                <li th:if="${session.META_USER}!=null and ${session.META_USER.role}=='user'" id="nav-order"><a href="/user/order">历史订单</a></li>
 
                 <li role="presentation" class="dropdown" th:if="${session.META_USER}!=null">
                     <a class="dropdown-toggle" data-toggle="dropdown"
@@ -94,8 +94,15 @@
         <p>All Rights Reserved</p>
     </div>
 </footer>
-</body>
-<script type="text/javascript">
-    $(".navbar-collapse>ul>li").eq(0).addClass("active");
+<script type="text/javascript" th:fragment="nav-active-js">
+    var url = document.URL;
+    $("#nav-home").removeClass("active");
+    if (url.endsWith("register")) $("#nav-register").addClass("active");
+    else if (url.endsWith("login")) $("#nav-login").addClass("active");
+    else if (url.endsWith("find")) $("#nav-find").addClass("active");
+    else if (url.endsWith("flight")) $("#nav-flight").addClass("active");
+    else if (url.endsWith("order")) $("#nav-order").addClass("active");
+    else $("#nav-home").addClass("active");
 </script>
+</body>
 </html>
