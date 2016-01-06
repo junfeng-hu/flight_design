@@ -207,7 +207,9 @@ public class UserController {
     @RequestMapping(value = "/info", method = RequestMethod.GET)
     public String showInfoPage(HttpSession session) {
 
-        // Map<String, String> user = (Map<String, String>) session.getAttribute(SESSION_USER);
+        Map<String, String> user = (Map<String, String>) session.getAttribute(SESSION_USER);
+        user = Redis.getInstance().getUser(user.get("username"));
+        session.setAttribute(SESSION_USER, user);
         return "user/info";
     }
 
@@ -228,6 +230,8 @@ public class UserController {
                                            HttpSession session) throws GeneralSecurityException {
 
         Map<String, String> user = (Map<String, String>) session.getAttribute(SESSION_USER);
+        user = Redis.getInstance().getUser(user.get("username"));
+        session.setAttribute(SESSION_USER, user);
         MetaResult result = new MetaResult();
         // check username and password
         if (curPassword.isEmpty() || newPassword.isEmpty()) {

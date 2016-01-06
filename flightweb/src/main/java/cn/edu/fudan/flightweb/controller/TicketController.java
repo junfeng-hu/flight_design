@@ -1,5 +1,6 @@
 package cn.edu.fudan.flightweb.controller;
 
+import cn.edu.fudan.flightweb.db.Redis;
 import cn.edu.fudan.flightweb.domain.Flight;
 import cn.edu.fudan.flightweb.domain.Passenger;
 import cn.edu.fudan.flightweb.interceptor.Authenticated;
@@ -62,15 +63,17 @@ public class TicketController {
         // done handle order logical
         Map<String, String> user = (Map<String, String>) session.getAttribute(UserController.SESSION_USER);
         List<String> passengerL = Arrays.asList(passengers.split("&"));
-        boolean ret = orderFlightService.doOrderFlight(flightId, isFirst,
+        Double point = orderFlightService.doOrderFlight(flightId, isFirst,
                 user.get("username"), passengerL);
-        if (!ret) {
+        if (point <= 0) {
             // order fail
             result.setStatus(MetaResult.Status.ERROR);
             result.setMessage("预订失败，请刷新页面");
         }
         else {
             // success
+            // update user point
+            Redis.getInstance().updateUserPoint(user.get("username"), point);
             result.setStatus(MetaResult.Status.SUCCESS);
             result.setMessage("预订成功，请查看历史订单");
         }

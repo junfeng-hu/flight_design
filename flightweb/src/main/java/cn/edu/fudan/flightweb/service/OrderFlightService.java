@@ -24,14 +24,14 @@ public class OrderFlightService {
     @Autowired
     private OrderFlightRepository orderFlightRepository;
 
-    public boolean doOrderFlight(long flightId, boolean isFirst,
+    public Double doOrderFlight(long flightId, boolean isFirst,
                                  String orderUser, List<String> passengers) {
         Flight flight = flightRepository.findOne(flightId);
         Double price;
         if (isFirst) {
             if (flight.getFirstCount() < passengers.size()) {
                 // first tickets not enough
-                return false;
+                return -1d;
             }
             flight.setFirstCount(flight.getFirstCount() - passengers.size());
             price = flight.getFirstPrice() * passengers.size();
@@ -39,7 +39,7 @@ public class OrderFlightService {
         else {
             if (flight.getEconomyCount() < passengers.size()) {
                 // economy tickets not enough
-                return false;
+                return -1d;
             }
             flight.setEconomyCount(flight.getEconomyCount() - passengers.size());
             price = flight.getEconomyPrice() * passengers.size();
@@ -56,6 +56,6 @@ public class OrderFlightService {
         orderFlight.setPrice(price);
         orderFlightRepository.save(orderFlight);
         flightRepository.save(flight);
-        return true;
+        return price;
     }
 }

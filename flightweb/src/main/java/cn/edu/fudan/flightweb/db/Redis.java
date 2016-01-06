@@ -77,6 +77,17 @@ public class Redis {
         }
     }
 
+    public boolean updateUserPoint(String username, Double point) {
+        try(Jedis jedis = pool.getResource()) {
+            jedis.hincrByFloat(userKeyPrefix + username, "point", point);
+            return true;
+        }
+        catch (Exception e) {
+            logger.warn("when update user {}'s point to Redis", username, e);
+            throw e;
+        }
+    }
+
     /**
      * get user's detail info
      * @param username
